@@ -16,6 +16,9 @@ AWS CodeBuild/CodePipeline does not nativly support GitLab Repositories. You can
 └── .gitignore                  <-- Files to ignore by git
 ```
 
+## Status
+[![Build Status](https://travis-ci.com/hendricjabs/aws-gitlab-connector.png)](https://travis-ci.org/hendricjabs/aws-gitlab-connector)
+
 ## Requirements
 
 * AWS CLI already configured with Administrator permission
