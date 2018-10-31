@@ -1,4 +1,4 @@
-# git-connector
+# AWS GitLab Connector
 
 AWS CodeBuild/CodePipeline does not nativly support GitLab Repositories. You can only build repositories from CodeCommit, GitHub and Zip-Files stored in Amazon S3. This is a sample template for a GitLab connector for AWS CodeBuild. To use it you need to set up the Lambda endpoint as described below, add it as webhook for push-events to your GitLab repository and change your CodeBuild or CodePipeline configuration so that the destination S3-Bucket is your source of code.
 ```bash
