@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Parameters: 
+  BucketName: 
+    Type: String
+    Description: The bucket name to store the zip-files
+  ApiKey: 
+    Type: String
+    Description: API-Key
+  
+Description: >
+  git-connector
+  
+  Sample SAM Template for gitlab connector
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Ref BucketName
+  GitConnectorFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: gitlab-connector/
+      Handler: gitlab-connector
+      Runtime: go1.x
+     # Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        CatchAll:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /gitlab
+            Method: POST
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          S3_BUCKET: !Ref BucketName
+          API_KEY: !Ref ApiKey
+          S3_REGION: !Ref "AWS::Region"
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal: {Service: [lambda.amazonaws.com]}
+          Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+      - PolicyName: S3Policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 's3:PutObject'
+              Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+Outputs:
+  HelloWorldAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/gitlab/"
+
+  GitConnectorFunction:
+    Description: "Lambdafunction for downloading GIT-Repositories as Helper for CodePipeline"
+    Value: !GetAtt GitConnectorFunction.Arn
+
+  GitConnectorFunctionIamRole:
+    Description: "Implicit IAM Role created for GitConnectorFunction"
+    Value: !GetAtt GitConnectorFunction.Arn
