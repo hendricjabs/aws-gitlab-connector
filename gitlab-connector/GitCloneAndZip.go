@@ -9,6 +9,7 @@ import (
 	"gopkg.in/src-d/go-billy.v4"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 
 	log "github.com/sirupsen/logrus"
 	git "gopkg.in/src-d/go-git.v4"
@@ -20,6 +21,8 @@ import (
 type GitCloneAndZipInput struct {
 	repositoryUrl string
 	apiKey        string
+	username      string
+	password      string
 }
 
 // GitCloneAndZipOutput: size and content of the zip file
@@ -44,10 +47,16 @@ func GitCloneAndZip(input *GitCloneAndZipInput) (GitCloneAndZipOutput, error) {
 
 	log.Infof("git clone %s", input.repositoryUrl)
 
+    var auth transport.AuthMethod
+    if input.apiKey != "" {
+	   auth = &http.TokenAuth{Token: input.apiKey}
+    } else {
+       auth = &http.BasicAuth{Username: input.username, Password: input.password}
+	}
 	// Clones the given repository in memory
 	_, err := git.Clone(storer, fs, &git.CloneOptions{
 		URL:  input.repositoryUrl,
-		Auth: &http.TokenAuth{Token: input.apiKey},
+		Auth: auth,
 	})
 	if CheckIfError(err) {
 		return GitCloneAndZipOutput{}, err

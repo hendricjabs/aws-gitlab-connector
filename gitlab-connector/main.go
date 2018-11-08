@@ -42,6 +42,8 @@ type WebHookResponse struct {
 
 var (
 	API_KEY   = os.Getenv("API_KEY")
+    USERNAME  = os.Getenv("USERNAME")
+    PASSWORD  = os.Getenv("PASSWORD")
 	S3_BUCKET = os.Getenv("S3_BUCKET")
 	S3_REGION = os.Getenv("S3_REGION")
 )
@@ -84,7 +86,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}).Info("Got following Parameter:")
 
 	// clone repository and put into zip file
-	file, err := GitCloneAndZip(&GitCloneAndZipInput{apiKey: API_KEY, repositoryUrl: webHookRequest.Repository.URL})
+	file, err := GitCloneAndZip(&GitCloneAndZipInput{apiKey: API_KEY, username: USERNAME, password: PASSWORD, repositoryUrl: webHookRequest.Repository.URL})
 	if CheckIfError(err) {
 		return events.APIGatewayProxyResponse{
 			Body:       err.Error(),

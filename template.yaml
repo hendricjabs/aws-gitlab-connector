@@ -45,6 +45,8 @@ Resources:
         Variables:
           S3_BUCKET: !Ref BucketName
           API_KEY: !Ref ApiKey
+          USERNAME: ''
+          PASSWORD: ''
           S3_REGION: !Ref "AWS::Region"
   LambdaExecutionRole:
     Type: AWS::IAM::Role
