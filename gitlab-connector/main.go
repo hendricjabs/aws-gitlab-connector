@@ -18,7 +18,7 @@ import (
 
 // Repository: struct for repository information
 type Repository struct {
-	URL  string `json:"url"`
+	URL  string `json:"git_http_url"`
 	Name string `json:"name"`
 }
 
