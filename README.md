@@ -77,28 +77,36 @@ Events:
 
 ## Packaging and deployment
 
-AWS Lambda Python runtime requires a flat folder with all dependencies including the application. SAM will use `CodeUri` property to know where to look up for both application and dependencies:
+To deploy the connector you can simply use the Docker deployment.
 
-```yaml
-...
-    FirstFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            CodeUri: gitlab-connector/
-            ...
+First you need to build the image with some parameters you should define previously.
+Replace 
+* `<Target Bucket>` with the S3 bucket where the CloudFormation template shall be stored.
+* `<Lambda Bucket>` with the S3 bucket where the Lambda deployment package shall be stored.
+* `<AWS Access Key>` with your AWS access key (e.g. AKIAXXXXXXXXXXXXXXXQ)
+* `<AWS Secret Access Key>` with your AWS secret access key (e.g. NMAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXR)
+* `<Region>` with the region you want to deploy the stack in
+
+```sh
+TARGET_BUCKET=<Target Bucket>
+LAMBDA_BUCKET=<Lambda Bucket>
+AWS_ACCESS_KEY=<AWS Access Key>
+AWS_SECRET_ACCESS_KEY=<AWS Secret Access Key>
+REGION=<Region>
+
+docker build \
+    --build-arg target_bucket=$TARGET_BUCKET \
+    --build-arg lambda_bucket=$LAMBDA_BUCKET \
+    --build-arg aws_access_key=$AWS_ACCESS_KEY \
+    --build-arg aws_secret_key=$AWS_SECRET_ACCESS_KEY \ 
+    --build-arg region=$REGION \
+    -t hendricjabs/aws-gitlab-connector .
 ```
 
-First and foremost, we need a S3 bucket where we can upload our Lambda functions packaged as ZIP and another S3 bucket which is used as target for the packaged Git-Repository - If you don't have the S3 buckets to store code artifacts and result files then this is a good time to create one:
-
-```bash
-aws s3 mb s3://BUCKET_NAME
+Now you can run the deployment process:
+```sh
+docker run hendricjabs/aws-gitlab-connector
 ```
-
-Next you can use `make` to deploy this setup. Replace `<TEMPLATE BUCKET>` with the bucket where the Lambda function is stored, <CLOUDFORMATION STACK NAME> with a account-unique name for the CloudFormation stack and <TARGET BUCKET> with the S3 bucket name of the bucket, where the result ZIP files will be stored
-```bash
-make deploy S3_LAMBDA_BUCKET=<LAMBDA BUCKET> STACK_NAME=<CLOUDFORMATION STACK NAME> S3_TARGET_BUCKET=<TARGET BUCKET>
-```
-> **See [Serverless Application Model (SAM) HOWTO Guide](https://github.com/awslabs/serverless-application-model/blob/master/HOWTO.md) for more details in how to get started.**
 
 After deployment is complete you can run the following command to retrieve the API Gateway Endpoint URL:
 
