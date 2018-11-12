@@ -7,7 +7,15 @@ Parameters:
   ApiKey: 
     Type: String
     Description: API-Key
-  
+    Default: ''
+  Username: 
+    Type: String
+    Description: Username with read access to the Gitlab Repository
+    Default: ''
+  Password: 
+    Type: String
+    Description: Password
+    Default: ''
 Description: >
   git-connector
   
@@ -45,8 +53,8 @@ Resources:
         Variables:
           S3_BUCKET: !Ref BucketName
           API_KEY: !Ref ApiKey
-          USERNAME: ''
-          PASSWORD: ''
+          USERNAME: !Ref Username
+          PASSWORD: !Ref Password
           S3_REGION: !Ref "AWS::Region"
   LambdaExecutionRole:
     Type: AWS::IAM::Role
