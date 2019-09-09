@@ -136,9 +136,7 @@ Please ensure Go 1.x (where 'x' is the latest version) is installed as per the i
 
 Here are a few ideas that you can use to get more acquainted as to how this overall process works:
 
-* Create an additional API resource for Atlassian BitBucket
-* Update unit test to capture that
-* Package & Deploy
+* ~~Create an additional API resource for Atlassian BitBucket~~ *Now supported by AWS CodeBuild.*
 
 Next, you can use the following resources to know more about beyond hello world samples and how others structure their Serverless applications:
 
