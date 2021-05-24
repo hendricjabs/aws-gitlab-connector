@@ -29,5 +29,7 @@ RUN mkdir -p ~/.aws
 RUN printf "[default]\naws_access_key_id = $AWS_ACCESS_KEY\naws_secret_access_key = $AWS_SECRET_KEY" > ~/.aws/credentials
 
 # Build lambda binary and deploy template
+RUN cd /go/src/github.com/hendricjabs/aws-gitlab-connector; go mod init
 RUN cd /go/src/github.com/hendricjabs/aws-gitlab-connector; make deps clean build
+
 CMD cd /go/src/github.com/hendricjabs/aws-gitlab-connector; make S3_TARGET_BUCKET=$TARGET_BUCKET S3_LAMBDA_BUCKET=$LAMBDA_BUCKET USERNAME=$USERNAME PASSWORD=$PASSWORD API_KEY=$APIKEY REGION=$REGION deploy
